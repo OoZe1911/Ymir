@@ -242,7 +242,6 @@ public class Ymir {
 					break;
 				}
 			}
-
 			in.close();
 			logger.info("Listes des repertoires a traiter en emission : " + liste_rep_emission);
 			logger.info("Listes des repertoires a traiter en reception : " + liste_rep_reception);
@@ -254,7 +253,9 @@ public class Ymir {
 
 		while (!exit) {
 			for (int i = 0; i < liste_rep_emission.size(); i++) {
+				@SuppressWarnings("unchecked")
 				String local_dir = ((Vector<String>)liste_rep_emission.get(i)).get(0);
+				@SuppressWarnings("unchecked")
 				String remote_dir = ((Vector<String>)liste_rep_emission.get(i)).get(1);
 				logger.debug("T / Traitement du repertoire : " + local_dir);
 
