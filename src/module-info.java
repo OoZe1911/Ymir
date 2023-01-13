@@ -1,9 +1,0 @@
-/**
- * 
- */
-/**
- * @author fabrice
- *
- */
-module Ymir {
-}
