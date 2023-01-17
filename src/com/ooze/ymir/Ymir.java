@@ -23,20 +23,8 @@ public class Ymir {
 	static boolean exit = false;
 
 	public static void main(String[] args) {
-		String cmd = "";
-		if (args.length > 0)
-			cmd = args[0]; 
-		try {
-			if ("stop".equals(cmd)) {
-				stopProcess();
-			}else {
-				System.out.println(new Date() + " - Ymir v2.1 is starting - (c) 2012 / Syntesys Group");
-				startProcess();
-			}
-		}catch (Exception ex) {
-			System.err.println(new Date() + " - An unexpected error occured." + ex);
-			logger.fatal("An unexpected error occured", ex);
-		}
+		System.out.println(new Date() + " - Ymir v2.1 is starting - (c) 2012 / Syntesys Group");
+		startProcess();
 	}
 	
 	public static void startProcess() {
@@ -46,10 +34,9 @@ public class Ymir {
 					}
 				});
 
-		logger.info("--------------------------------------------");
-		logger.info(" Demarrage du Connecteur FTPS/SFTP Ymir v2.1");
-		logger.info("      (c) 2010-2012 / Syntesys Group");
-		logger.info("--------------------------------------------");
+		logger.info("--------------------------------------");
+		logger.info("          Starting Ymir v2.2          ");
+		logger.info("--------------------------------------");
 
 		License.setLicenseDetails("Syntesys", "360-0090-4146-3624");
 		Properties conf = null;
@@ -58,107 +45,94 @@ public class Ymir {
 			conf = FileUtil.readPropertiesFile("ymir.properties");
 		}catch (Exception e) {
 			e.printStackTrace();
-			logger.fatal("Impossible de lire le fichier de configuration.");
+			logger.fatal("Can not read configuration file : ymir.properties");
 			System.exit(-1);
 		}
 
-		if (!exit) {
-			FTPManager.FTP_SERVERS = conf.getProperty("FTP_SERVERS").split(",");
-			if (FTPManager.FTP_SERVERS[0] == null || FTPManager.FTP_SERVERS[0].length() == 0 || FTPManager.FTP_SERVERS[0].equalsIgnoreCase("null")) {
-				logger.fatal("Pas d'adresse/port de serveur FTPS/SFTP !");
-				exit = true;
-			}
+		FTPManager.FTP_SERVERS = conf.getProperty("SERVER").split(",");
+		if (FTPManager.FTP_SERVERS[0] == null || FTPManager.FTP_SERVERS[0].length() == 0 || FTPManager.FTP_SERVERS[0].equalsIgnoreCase("null")) {
+			logger.fatal("No host and port defined !");
+			exit = true;
 		}
 
-		if (!exit) {
-			String protocol = conf.getProperty("PROTOCOL");
-			if (protocol == null || protocol.length() == 0 || protocol.equalsIgnoreCase("null")) {
-				FTPManager.PROTOCOL = "FTP";
-			}else if (protocol.equalsIgnoreCase("FTP")) {
-				FTPManager.PROTOCOL = "FTP";
-			}else if (protocol.equalsIgnoreCase("FTPS")) {
-				FTPManager.PROTOCOL = "FTPS";
-			}else if (protocol.equalsIgnoreCase("SFTP")) {
-				FTPManager.PROTOCOL = "SFTP";
-			}else {
-				FTPManager.PROTOCOL = "FTP";
-			}
-			logger.info("Protocole : " + FTPManager.PROTOCOL);
+		String protocol = conf.getProperty("PROTOCOL");
+		if (protocol == null || protocol.length() == 0 || protocol.equalsIgnoreCase("null")) {
+			FTPManager.PROTOCOL = "FTP";
+		}else if (protocol.equalsIgnoreCase("FTP")) {
+			FTPManager.PROTOCOL = "FTP";
+		}else if (protocol.equalsIgnoreCase("FTPS")) {
+			FTPManager.PROTOCOL = "FTPS";
+		}else if (protocol.equalsIgnoreCase("SFTP")) {
+			FTPManager.PROTOCOL = "SFTP";
+		}else {
+			FTPManager.PROTOCOL = "FTP";
+		}
+		logger.info("Protocol : " + FTPManager.PROTOCOL);
+
+		FTPManager.FTP_login_T = conf.getProperty("S_LOGIN");
+		if (FTPManager.FTP_login_T == null || FTPManager.FTP_login_T.length() == 0 || FTPManager.FTP_login_T.equalsIgnoreCase("null")) {
+			logger.fatal("No sending login found !");
+			exit = true;
+		}else {
+			logger.info("Sending login : " + FTPManager.FTP_login_T);
 		}
 
-		if (!exit) {
-			FTPManager.FTP_login_T = conf.getProperty("FTP_LOGIN_T");
-			if (FTPManager.FTP_login_T == null || FTPManager.FTP_login_T.length() == 0 || FTPManager.FTP_login_T.equalsIgnoreCase("null")) {
-				logger.fatal("Pas de login de Transmission !");
-				exit = true;
-			}else {
-				logger.info("Login de Transmission : " + FTPManager.FTP_login_T);
-			}
+		FTPManager.FTP_password_T = conf.getProperty("S_PASSWORD");
+		if (FTPManager.FTP_password_T == null || FTPManager.FTP_password_T.length() == 0 || FTPManager.FTP_password_T.equalsIgnoreCase("null")) {
+			logger.fatal("No password found for sending login");
+			exit = true;
 		}
 
-		if (!exit) {
-			FTPManager.FTP_password_T = conf.getProperty("FTP_PASSWORD_T");
-			if (FTPManager.FTP_password_T == null || FTPManager.FTP_password_T.length() == 0 || FTPManager.FTP_password_T.equalsIgnoreCase("null")) {
-				logger.fatal("Pas de mot de passe !");
-				exit = true;
-			}
+		FTPManager.FTP_login_R = conf.getProperty("R_LOGIN");
+		if (FTPManager.FTP_login_R == null || FTPManager.FTP_login_R.length() == 0 || FTPManager.FTP_login_R.equalsIgnoreCase("null")) {
+			logger.fatal("No receiving login found !");
+			exit = true;
+		}else {
+			logger.info("Receiving login : " + FTPManager.FTP_login_R);
 		}
 
-		if (!exit) {
-			FTPManager.FTP_login_R = conf.getProperty("FTP_LOGIN_R");
-			if (FTPManager.FTP_login_R == null || FTPManager.FTP_login_R.length() == 0 || FTPManager.FTP_login_R.equalsIgnoreCase("null")) {
-				logger.fatal("Pas de login de Reception !");
-				exit = true;
-			}else {
-				logger.info("Login de Reception : " + FTPManager.FTP_login_R);
-			}
-		}
-		if (!exit) {
-			FTPManager.FTP_password_R = conf.getProperty("FTP_PASSWORD_R");
-			if (FTPManager.FTP_password_R == null || FTPManager.FTP_password_R.length() == 0 || FTPManager.FTP_password_R.equalsIgnoreCase("null")) {
-				logger.fatal("Pas de mot de passe !");
-				exit = true;
-			}
+
+		FTPManager.FTP_password_R = conf.getProperty("R_PASSWORD");
+		if (FTPManager.FTP_password_R == null || FTPManager.FTP_password_R.length() == 0 || FTPManager.FTP_password_R.equalsIgnoreCase("null")) {
+			logger.fatal("No password found for receiving login");
+			exit = true;
 		}
 
-		if (!exit) {
-			archive_dir = new File(conf.getProperty("ARCHIVE_FOLDER"));
-			logger.info("Repertoire d'archivage des fichiers emis : " + archive_dir.toString());
-			if (!archive_dir.exists()) {
-				logger.fatal("Le repertoire d'archivage n'existe pas.");
-				exit = true;
-			}
+		archive_dir = new File(conf.getProperty("ARCHIVE_FOLDER"));
+		logger.info("Archived folder for files sent : " + archive_dir.toString());
+		if (!archive_dir.exists()) {
+			logger.fatal("Archived folder does not exist");
+			exit = true;
 		}
 
-		if (!exit) {
-			sleep_duration = Integer.parseInt(conf.getProperty("SLEEP_DURATION"));
-			logger.info("Duree d'endormissement : " + sleep_duration);
-		}
+		sleep_duration = Integer.parseInt(conf.getProperty("SLEEP_DURATION"));
+		logger.info("Sleeping dureation : " + sleep_duration);
 
-		if (!exit) {
-			FTPManager.exit_command = conf.getProperty("EXIT_COMMAND");
-			logger.info("Exit de fin de transfert : " + FTPManager.exit_command);
+		FTPManager.exit_command = conf.getProperty("EXIT_COMMAND");
+		if(FTPManager.exit_command == null || FTPManager.exit_command.length() ==0) {
+			FTPManager.exit_command = null;
+			logger.info("No exit command");
+		} else {
+			logger.info("Exit command used after a file is received : " + FTPManager.exit_command);
 			if (!FileUtil.fileExists(FTPManager.exit_command)) {
-				logger.fatal("La commande d'exit n'existe pas.");
+				logger.fatal("Exit command does not exist");
 				exit = true;
 			}else if (FTPManager.exit_command.contains(" ")) {
 				FTPManager.exit_command = "\"" + FTPManager.exit_command + "\"";
 			}
 		}
 
-		if (!exit) {
-			String removeFileAfterDownload = conf.getProperty("REMOVE_REMOTE_FILE_AFTER_DOWNLOAD");
-			if (removeFileAfterDownload.equalsIgnoreCase("true")) {
-				FTPManager.removeFileAfterDownload = true;
-			}else {
-				FTPManager.removeFileAfterDownload = false;
-			}
-			logger.info("Remove remote file after download : " + FTPManager.removeFileAfterDownload);
+		String removeFileAfterDownload = conf.getProperty("REMOVE_REMOTE_FILE_AFTER_DOWNLOAD");
+		if (removeFileAfterDownload.equalsIgnoreCase("true")) {
+			FTPManager.removeFileAfterDownload = true;
+		}else {
+			FTPManager.removeFileAfterDownload = false;
 		}
+		logger.info("Remove remote file after download : " + FTPManager.removeFileAfterDownload);
 
 		if (!exit) {
 			int retention_period = Integer.parseInt(conf.getProperty("RETENTION_PERIOD"));
-			logger.info("Duree de retention des fichiers archives : " + retention_period);
+			logger.info("Retention period for archived files (in days) : " + retention_period);
 			Calendar cal = Calendar.getInstance(TimeZone.getDefault());
 			boolean chgtAnnee = false;
 			if (cal.get(5) < retention_period - 1 && cal.get(2) == 1)
@@ -171,7 +145,7 @@ public class Ymir {
 			cal.set(14, 0);
 			if (chgtAnnee)
 				cal.roll(1, false); 
-			logger.info("Purge des vieux fichiers archives ---");
+			logger.info("Removing old files ---");
 			File[] children = archive_dir.listFiles();
 			int nb = 0;
 			for (int j = 0; j < children.length; j++) {
@@ -179,13 +153,13 @@ public class Ymir {
 				if (!file.isDirectory()) {
 					Date fileDate = new Date(file.lastModified());
 					if (fileDate.before(cal.getTime())) {
-						logger.info("Suppression du fichier : " + file.getName() + " - " + fileDate);
+						logger.info("File deleted : " + file.getName() + " - " + fileDate);
 						file.delete();
 						nb++;
 					}
 				}
 			}
-			logger.info("--- Fin de la purge : " + nb + " fichiers supprimes.");
+			logger.info("--- " + nb + " old files deleted.");
 		}
 
 		if (!exit) {
@@ -216,7 +190,7 @@ public class Ymir {
 						continue;
 					}
 					exit = true;
-					logger.fatal("Fichier de configuration incorrect.");
+					logger.fatal("Incorrect configuration file : ymir.conf");
 					break;
 				}
 
@@ -234,22 +208,22 @@ public class Ymir {
 							continue;
 						}
 						exit = true;
-						logger.fatal("Le repertoire : " + local_dir + " n'existe pas.");
+						logger.fatal("Local folder : " + local_dir + " does not exist");
 						break;
 					}
 					exit = true;
-					logger.fatal("Fichier de configuration incorrect.");
+					logger.fatal("Incorrect configuration file : ymir.conf");
 					break;
 				}
 			}
 			in.close();
-			logger.info("Listes des repertoires a traiter en emission : " + liste_rep_emission);
-			logger.info("Listes des repertoires a traiter en reception : " + liste_rep_reception);
+			logger.info("Local folders used to send files (local source/remote destination): " + liste_rep_emission);
+			logger.info("Remote folders used to download files (remote source/local destination) : " + liste_rep_reception);
 		}catch (Exception e) {
 			e.printStackTrace();
 			exit = true;
 		}
-		logger.info("--- Fin initYmir()");
+		logger.info("--- End initYmir()");
 
 		while (!exit) {
 			for (int i = 0; i < liste_rep_emission.size(); i++) {
@@ -257,12 +231,12 @@ public class Ymir {
 				String local_dir = ((Vector<String>)liste_rep_emission.get(i)).get(0);
 				@SuppressWarnings("unchecked")
 				String remote_dir = ((Vector<String>)liste_rep_emission.get(i)).get(1);
-				logger.debug("T / Traitement du repertoire : " + local_dir);
+				logger.debug("Sending / Processing local folder : " + local_dir);
 
 				File dir = new File(local_dir);
 
 				if (!dir.exists()) {
-					logger.warn("Repertoire INEXISTANT : " + dir.toString());
+					logger.warn("Folder does not exist : " + dir.toString());
 				} else {
 					File[] children = dir.listFiles();
 					if (children != null && children.length > 0) {
@@ -272,10 +246,10 @@ public class Ymir {
 							if (!file.isDirectory()) {
 								liste_fichiers.add(file.getName().toString());
 							}else {
-								logger.debug("--- Pas de traitement du repertoire --- : " + file.getPath());
+								logger.debug("--- Folder ignored --- : " + file.getPath());
 							}
 						}
-						logger.debug("Liste des fichiers trouves : " + liste_fichiers);
+						logger.debug("Local files found : " + liste_fichiers);
 						if (liste_fichiers.size() > 0)
 							FTPManager.sendFiles(local_dir, liste_fichiers, remote_dir); 
 					}
@@ -285,7 +259,7 @@ public class Ymir {
 			FTPManager.getFiles(liste_rep_reception);
 			if (!exit)
 				try {
-					logger.debug("Endormissement du Connecteur FTPS/SFTP Ymir");
+					logger.debug("Ymir is sleeping now");
 					Thread.sleep((1000 * sleep_duration));
 				}catch (InterruptedException ex) {
 					ex.printStackTrace();
@@ -303,32 +277,30 @@ public class Ymir {
 	}
 	
 	public static void stopProcess() {
-		if (!exit) {
-			System.out.println(new Date() + " - Shutdown requested / Ymir is stopping.");
-			logger.warn("Shutdown requested / Arret du Connecteur FTPS/SFTP Ymir.");
-			exit = true;
-		}
+		System.out.println(new Date() + " - Shutdown requested / Ymir is stopping.");
+		logger.warn("Shutdown requested / Ymir is stopping.");
+		exit=true;
 	}
 	
 	public static boolean archiveFile(String file) {
-		logger.info("Archivage du fichier : " + file);
+		logger.info("Archiving file : " + file);
 		File physicalFile = new File(file);
 		if (physicalFile.renameTo(new File(archive_dir, physicalFile.getName()))) {
-			logger.info("Archivage du fichier " + physicalFile.toString() + " dans " + archive_dir.toString());
+			logger.info("Archiving file " + physicalFile.toString() + " in " + archive_dir.toString());
 			return true;
 		}
 		if (FileUtil.fileExists(file)) {
-			logger.warn("Un fichier portant le meme nom a deja ete archive.");
+			logger.warn("A file with a same filename has been already archived");
 			File oldOne = new File(String.valueOf(archive_dir.getPath()) + "/" + physicalFile.getName());
 			oldOne.delete();
 			if (!physicalFile.renameTo(new File(archive_dir, physicalFile.getName()))) {
-				logger.fatal("Impossible d'archiver le fichier " + physicalFile.toString() + " dans " + archive_dir.toString());
+				logger.fatal("Can not archives file " + physicalFile.toString() + " in " + archive_dir.toString());
 				exit = true;
 				return false;
 			}
 			return true;
 		}
-		logger.warn("Impossible d'archiver : le fichier n'existe plus.");
+		logger.warn("File does not existe anymore, can not archive.");
 		return true;
 	}
 }

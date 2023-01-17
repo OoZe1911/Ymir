@@ -205,8 +205,10 @@ public class FTPManager {
 								deleted = true;
 								System.out.println(new Date() + " - WARN - File " + files[i].getName() + " was partial (file removed).");
 							}  
-						if (!deleted)
-							SysUtil.execCmd(String.valueOf(exit_command) + " \"" + local_file + "\""); 
+						if (!deleted) {
+							if(exit_command != null)
+								SysUtil.execCmd(String.valueOf(exit_command) + " \"" + local_file + "\"");
+						}
 					}
 				} 
 			} 
