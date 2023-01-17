@@ -15,11 +15,11 @@ import org.apache.logging.log4j.Logger;
 public class FTPManager {
 	static Logger logger = LogManager.getLogger(Ymir.class.getName());
 	
-	public static String[] FTP_SERVERS = null;
-	public static String FTP_login_T = null;
-	public static String FTP_password_T = null;
-	public static String FTP_login_R = null;
-	public static String FTP_password_R = null;
+	public static String[] SERVERS = null;
+	public static String S_login = null;
+	public static String S_password = null;
+	public static String R_login = null;
+	public static String R_password = null;
 	public static String PROTOCOL = "FTP";
 	public static String exit_command = "";
 	public static boolean removeFileAfterDownload = true;
@@ -36,8 +36,8 @@ public class FTPManager {
 				ftp.setProtocol(Protocol.SFTP);
 			}
 	
-			ftp.setUserName(FTP_login_T);
-			ftp.setPassword(FTP_password_T);
+			ftp.setUserName(S_login);
+			ftp.setPassword(S_password);
 			ftp.getAdvancedFTPSettings().setAutoPassiveIPSubstitution(true);
 			ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
 			ftp.setContentType(FTPTransferType.BINARY);
@@ -45,12 +45,12 @@ public class FTPManager {
 			int connexionId = 0;
 			boolean timedOut = true;
 	
-			while (timedOut && connexionId < FTP_SERVERS.length) {
+			while (timedOut && connexionId < SERVERS.length) {
 				try {
-					String[] IPandPort = FTP_SERVERS[connexionId].split(":");
+					String[] IPandPort = SERVERS[connexionId].split(":");
 					ftp.setRemoteHost(IPandPort[0]);
 					ftp.setRemotePort(Integer.parseInt(IPandPort[1]));
-					logger.info("T / Connexion au serveur : " + IPandPort[0] + " / " + IPandPort[1]);
+					logger.info("S / Connecting to host : " + IPandPort[0] + " / " + IPandPort[1]);
 					ftp.connect();
 					timedOut = false;
 				} catch (Exception ex) {
@@ -67,17 +67,17 @@ public class FTPManager {
 			}
 
 			if (timedOut) {
-				logger.warn("Impossible de se connecter / time out");
+				logger.warn("Can not connect / time out");
 				return false;
 			}
 
-			logger.info("T / Changement de repertoire : " + remote_dir);
+			logger.info("S / Switching to folder : " + remote_dir);
 			ftp.changeDirectory(remote_dir);
 			String local_file = new String();
 			for (int i = 0; i < liste_fichiers.size(); i++) {
 				local_file = String.valueOf(local_dir) + "/" + (String)liste_fichiers.get(i);
 				if (!FileUtil.isFileLocked(new File(local_file))) {
-					logger.info("T / Transfert : " + local_file + " -> " + remote_dir + "/" + (String)liste_fichiers.get(i));
+					logger.info("S / Sending : " + local_file + " -> " + remote_dir + "/" + (String)liste_fichiers.get(i));
 					ftp.uploadFile(local_file, liste_fichiers.get(i));
 					System.out.println(new Date() + " - File sent : " + (String)liste_fichiers.get(i));
 					if (!Ymir.archiveFile(local_file))
@@ -87,7 +87,7 @@ public class FTPManager {
 					logger.warn("File " + local_file + " is in use (file not sent).");
 				} 
 			} 
-			logger.info("T / ...Deconnexion...");
+			logger.info("S / ...Disconnected...");
 			ftp.disconnect();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -110,20 +110,20 @@ public class FTPManager {
 				ftp.setProtocol(Protocol.SFTP);
 			}
 
-			ftp.setUserName(FTP_login_R);
-			ftp.setPassword(FTP_password_R);
+			ftp.setUserName(R_login);
+			ftp.setPassword(R_password);
 			ftp.getAdvancedFTPSettings().setAutoPassiveIPSubstitution(true);
 			ftp.getAdvancedFTPSettings().setConnectMode(FTPConnectMode.PASV);
 			ftp.setContentType(FTPTransferType.BINARY);
 
 			int connexionId = 0;
 			boolean timedOut = true;
-			while (timedOut && connexionId < FTP_SERVERS.length) {
+			while (timedOut && connexionId < SERVERS.length) {
 				try {
-					String[] IPandPort = FTP_SERVERS[connexionId].split(":");
+					String[] IPandPort = SERVERS[connexionId].split(":");
 					ftp.setRemoteHost(IPandPort[0]);
 					ftp.setRemotePort(Integer.parseInt(IPandPort[1]));
-					logger.info("T / Connexion au serveur : " + IPandPort[0] + " / " + IPandPort[1]);
+					logger.info("R / Connecting to server : " + IPandPort[0] + " / " + IPandPort[1]);
 					ftp.connect();
 					timedOut = false;
 				} catch (Exception ex) {
@@ -139,7 +139,7 @@ public class FTPManager {
 				}
 			} 
 			if (timedOut) {
-				logger.warn("Impossible de se connecter / time out");
+				logger.warn("Can not connect / time out");
 				return false;
 			}
 			for (int i = 0; i < liste_rep_reception.size(); i++) {
@@ -147,10 +147,10 @@ public class FTPManager {
 				String remote_dir = ((Vector<String>)liste_rep_reception.get(i)).get(0);
 				@SuppressWarnings("unchecked")
 				String local_dir = ((Vector<String>)liste_rep_reception.get(i)).get(1);
-				logger.debug("R / Traitement du r: " + remote_dir);
+				logger.debug("R / Processing remote folder : " + remote_dir);
 				downloadFiles(ftp, remote_dir, local_dir);
 			} 
-			logger.info("R / ...Deconnexion...");
+			logger.info("R / ...Disconnecting...");
 			ftp.disconnect();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -178,7 +178,7 @@ public class FTPManager {
 				}
 			}
 
-			logger.info("R / Changement de repertoire : " + remote_dir);
+			logger.info("R / Switching to remote folder : " + remote_dir);
 			ftp.changeDirectory("/");
 			ftp.changeDirectory(remote_dir);
 
@@ -191,7 +191,7 @@ public class FTPManager {
 						download = wildCardMatch(files[i].getName(), pattern); 
 					if (download) {
 						local_file = String.valueOf(local_dir) + File.separatorChar + files[i].getName();
-						logger.info("R / Transfert : " + remote_dir + "/" + files[i].getName() + " -> " + local_file);
+						logger.info("R / Downloading : " + remote_dir + "/" + files[i].getName() + " -> " + local_file);
 						ftp.downloadFile(local_file, files[i].getName());
 						System.out.println(new Date() + " - File received : " + files[i].getName());
 						boolean deleted = false;
@@ -199,7 +199,7 @@ public class FTPManager {
 							try {
 								ftp.deleteFile(files[i].getName());
 							} catch (Exception ex) {
-								logger.warn("R / Impossible d'effacer le fichier distant : " + ex);
+								logger.warn("R / Can not remove remote file : " + ex);
 								File f = new File(local_file);
 								f.delete();
 								deleted = true;

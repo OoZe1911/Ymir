@@ -49,10 +49,16 @@ public class Ymir {
 			System.exit(-1);
 		}
 
-		FTPManager.FTP_SERVERS = conf.getProperty("SERVER").split(",");
-		if (FTPManager.FTP_SERVERS[0] == null || FTPManager.FTP_SERVERS[0].length() == 0 || FTPManager.FTP_SERVERS[0].equalsIgnoreCase("null")) {
+		FTPManager.SERVERS = conf.getProperty("SERVERS").split(",");
+		if (FTPManager.SERVERS[0] == null || FTPManager.SERVERS[0].length() == 0 || FTPManager.SERVERS[0].equalsIgnoreCase("null")) {
 			logger.fatal("No host and port defined !");
 			exit = true;
+		} else {
+			String hosts = new String();
+			for(int i=0;i<FTPManager.SERVERS.length;i++) {
+				hosts = hosts + FTPManager.SERVERS[i] + " ";
+			}
+			logger.info("Host to reach : " + hosts);
 		}
 
 		String protocol = conf.getProperty("PROTOCOL");
@@ -69,31 +75,31 @@ public class Ymir {
 		}
 		logger.info("Protocol : " + FTPManager.PROTOCOL);
 
-		FTPManager.FTP_login_T = conf.getProperty("S_LOGIN");
-		if (FTPManager.FTP_login_T == null || FTPManager.FTP_login_T.length() == 0 || FTPManager.FTP_login_T.equalsIgnoreCase("null")) {
+		FTPManager.S_login = conf.getProperty("S_LOGIN");
+		if (FTPManager.S_login == null || FTPManager.S_login.length() == 0 || FTPManager.S_login.equalsIgnoreCase("null")) {
 			logger.fatal("No sending login found !");
 			exit = true;
 		}else {
-			logger.info("Sending login : " + FTPManager.FTP_login_T);
+			logger.info("Sending login : " + FTPManager.S_login);
 		}
 
-		FTPManager.FTP_password_T = conf.getProperty("S_PASSWORD");
-		if (FTPManager.FTP_password_T == null || FTPManager.FTP_password_T.length() == 0 || FTPManager.FTP_password_T.equalsIgnoreCase("null")) {
+		FTPManager.S_password = conf.getProperty("S_PASSWORD");
+		if (FTPManager.S_password == null || FTPManager.S_password.length() == 0 || FTPManager.S_password.equalsIgnoreCase("null")) {
 			logger.fatal("No password found for sending login");
 			exit = true;
 		}
 
-		FTPManager.FTP_login_R = conf.getProperty("R_LOGIN");
-		if (FTPManager.FTP_login_R == null || FTPManager.FTP_login_R.length() == 0 || FTPManager.FTP_login_R.equalsIgnoreCase("null")) {
+		FTPManager.R_login = conf.getProperty("R_LOGIN");
+		if (FTPManager.R_login == null || FTPManager.R_login.length() == 0 || FTPManager.R_login.equalsIgnoreCase("null")) {
 			logger.fatal("No receiving login found !");
 			exit = true;
 		}else {
-			logger.info("Receiving login : " + FTPManager.FTP_login_R);
+			logger.info("Receiving login : " + FTPManager.R_login);
 		}
 
 
-		FTPManager.FTP_password_R = conf.getProperty("R_PASSWORD");
-		if (FTPManager.FTP_password_R == null || FTPManager.FTP_password_R.length() == 0 || FTPManager.FTP_password_R.equalsIgnoreCase("null")) {
+		FTPManager.R_password = conf.getProperty("R_PASSWORD");
+		if (FTPManager.R_password == null || FTPManager.R_password.length() == 0 || FTPManager.R_password.equalsIgnoreCase("null")) {
 			logger.fatal("No password found for receiving login");
 			exit = true;
 		}
@@ -106,7 +112,7 @@ public class Ymir {
 		}
 
 		sleep_duration = Integer.parseInt(conf.getProperty("SLEEP_DURATION"));
-		logger.info("Sleeping dureation : " + sleep_duration);
+		logger.info("Sleeping dureation (in seconds) : " + sleep_duration);
 
 		FTPManager.exit_command = conf.getProperty("EXIT_COMMAND");
 		if(FTPManager.exit_command == null || FTPManager.exit_command.length() ==0) {
