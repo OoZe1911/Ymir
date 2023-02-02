@@ -21,7 +21,7 @@ public class FileUtil {
 		boolean compressionOk = false;
 		long size = (new File(pathFile)).length();
 		if (size <= 6L) {
-			logger.warn("Le fichier " + pathFile + " est trop petit pour etre compresse.");
+			logger.warn("File " + pathFile + " is too small to be compressed.");
 			return false;
 		} 
 		String zipFileName = String.valueOf(pathFile) + ".zip";
@@ -31,7 +31,7 @@ public class FileUtil {
 			in.read(buffer);
 			in.close();
 			if (buffer[0] == 80 && buffer[1] == 75 && buffer[2] == 3 && buffer[3] == 4 && (buffer[4] == 20 || buffer[4] == 10) && buffer[5] == 0) {
-				logger.warn("Le fichier " + pathFile + " est deja compresse.");
+				logger.warn("File " + pathFile + " is already compressed.");
 				compressionOk = false;
 			} else {
 				ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
@@ -71,7 +71,7 @@ public class FileUtil {
 		try {
 			long size = (new File(pathFile)).length();
 			if (size <= 4L) {
-				logger.warn("Le fichier " + pathFile + " est trop petit pour etre compresse.");
+				logger.warn("File " + pathFile + " is too small to be compressed.");
 				return false;
 			} 
 			byte[] buffer = new byte[4];
@@ -80,7 +80,7 @@ public class FileUtil {
 			tmpin.close();
 			if ((buffer[0] == 31 && (buffer[1] & 0xFF) == 139 && buffer[2] == 8) || ((
 				buffer[0] & 0xFF) == 139 && buffer[1] == 31 && buffer[3] == 8)) {
-				logger.warn("Le fichier " + pathFile + " est deja compresse.");
+				logger.warn("File " + pathFile + " is already compressed.");
 				return false;
 			} 
 			GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(String.valueOf(pathFile) + ".gz"));
@@ -112,6 +112,7 @@ public class FileUtil {
 		Properties props = new Properties();
 		FileInputStream fis = new FileInputStream(path);
 		props.load(fis);
+		fis.close();
 		return props;
 	}
 	
@@ -136,7 +137,7 @@ public class FileUtil {
 				return true; 
 			return false;
 		} catch (Exception e) {
-			logger.warn("Impossible de controler le fichier " + file.getPath());
+			logger.warn("Can not check if the file " + file.getPath() + " is locked.");
 			return true;
 		} 
 	}
@@ -161,7 +162,7 @@ public class FileUtil {
 			} 
 			return hash;
 		} catch (Exception ex) {
-			logger.error("Impossible de calculer le hash du fichier : " + filename + " - Erreur : " + ex);
+			logger.error("Can not compute file hash : " + filename + " - Error : " + ex);
 			ex.printStackTrace();
 			return null;
 		} 

@@ -11,19 +11,21 @@ public class SysUtil {
 	static Logger logger = LogManager.getLogger(Ymir.class.getName());
 	
 	public static void execute(String cmd) {
-		logger.info("Execution de la commande : " + cmd);
+		logger.info("Executing command : " + cmd);
 		try {
+			@SuppressWarnings("deprecation")
 			Process p = Runtime.getRuntime().exec(cmd);
-			logger.info("Attente de la fin de la commande : " + cmd);
+			logger.info("Waiting command to end : " + cmd);
 			p.waitFor();
-			logger.info("Commande " + cmd + " terminee.");
+			logger.info("Command " + cmd + " ended.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static Vector<Object> execCmd(String cmd) {
-		logger.info("Execution de la commande : " + cmd);
+		logger.info("Executing command : " + cmd);
 		Vector<Object> result = new Vector<Object>();
 		int exit = 0;
 		StringBuffer outBuf = null;
@@ -53,7 +55,7 @@ public class SysUtil {
 		} 
 		result.add(Integer.valueOf(exit));
 		result.add(outBuf);
-		logger.info("Commande " + cmd + " terminee - Resultat : " + result);
+		logger.info("Command " + cmd + " ended - Result : " + result);
 		return result;
 	}
 }
