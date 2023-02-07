@@ -306,7 +306,7 @@ public class Ymir {
 			}
 			return true;
 		}
-		logger.warn("File does not existe anymore, can not archive.");
+		logger.warn("File does not exist anymore, can not archive.");
 		return true;
 	}
 }
