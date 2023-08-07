@@ -1,2 +1,2 @@
 # Ymir
-Robust FTP/FTPS/SFT client to transfer files from several locations to several destinations.
+Robust FTP/FTPS/SFTP client to transfer files from several locations to several destinations.
