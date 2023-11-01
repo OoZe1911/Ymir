@@ -13,7 +13,6 @@ public class SysUtil {
 	public static void execute(String cmd) {
 		logger.info("Executing command : " + cmd);
 		try {
-			@SuppressWarnings("deprecation")
 			Process p = Runtime.getRuntime().exec(cmd);
 			logger.info("Waiting command to end : " + cmd);
 			p.waitFor();
@@ -23,7 +22,6 @@ public class SysUtil {
 		} 
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static Vector<Object> execCmd(String cmd) {
 		logger.info("Executing command : " + cmd);
 		Vector<Object> result = new Vector<Object>();
